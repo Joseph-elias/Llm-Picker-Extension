@@ -4,6 +4,7 @@ import Header from './components/Header';
 import QueryInput from './components/QueryInput';
 import ActionButton from './components/ActionButton';
 import ResultArea from './components/ResultArea';
+import Footer from './components/Footer';
 import { useLLMPicker } from './hooks/useLLMPicker';
 
 function App() {
@@ -30,6 +31,9 @@ function App() {
         Find Best LLM
       </ActionButton>
       <ResultArea result={result} />
+      
+      {/* Add the footer here inside the popup */}
+      <Footer />
     </PopupContainer>
   );
 }
