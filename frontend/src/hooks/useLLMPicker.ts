@@ -1,38 +1,20 @@
 import { useState } from 'react';
 
 interface LLMResult {
-  model: string;
-  explanation: string;
+  model_name: string;
+  score: number;
+  task: string;
+  benchmark: string;
+  details: {
+    architecture: string;
+    precision: string;
+    weight_type: string;
+    params_billion: number;
+    base_model: string;
+    license: string;
+    upload_date: string;
+  };
 }
-
-// This is a mock implementation - in a real extension, this would call an actual API
-const mockGetRecommendation = async (query: string): Promise<LLMResult> => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Simple mock logic for demonstration
-  if (query.toLowerCase().includes('code')) {
-    return {
-      model: 'Claude Opus',
-      explanation: 'Claude Opus excels at understanding and generating code across multiple languages with detailed explanations.'
-    };
-  } else if (query.toLowerCase().includes('creative') || query.toLowerCase().includes('story')) {
-    return {
-      model: 'GPT-4o',
-      explanation: 'GPT-4o demonstrates exceptional creative writing abilities and storytelling with rich details and coherent narratives.'
-    };
-  } else if (query.toLowerCase().includes('image') || query.toLowerCase().includes('visual')) {
-    return {
-      model: 'Gemini Pro',
-      explanation: 'Gemini Pro has strong multimodal capabilities, making it excellent for tasks involving both text and visual elements.'
-    };
-  } else {
-    return {
-      model: 'Anthropic Claude 3 Sonnet',
-      explanation: 'For general purpose tasks with a balance of intelligence and cost-effectiveness, Claude 3 Sonnet provides excellent results.'
-    };
-  }
-};
 
 export const useLLMPicker = () => {
   const [query, setQuery] = useState('');
@@ -41,13 +23,25 @@ export const useLLMPicker = () => {
 
   const findBestLLM = async () => {
     if (!query.trim()) return;
-    
+
     setIsLoading(true);
     try {
-      const recommendation = await mockGetRecommendation(query);
-      setResult(recommendation);
+      const response = await fetch('http://localhost:5000/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task: query })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setResult(data);
+      } else {
+        console.error('Server error:', data.error);
+        setResult(null);
+      }
     } catch (error) {
-      console.error('Error finding best LLM:', error);
+      console.error('Error calling backend:', error);
+      setResult(null);
     } finally {
       setIsLoading(false);
     }
