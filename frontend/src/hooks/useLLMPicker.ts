@@ -16,8 +16,16 @@ interface LLMResult {
   };
 }
 
+interface Filters {
+  weight_type?: string;
+  license?: string;
+  architecture?: string;
+  params_max?: number;
+}
+
 export const useLLMPicker = () => {
   const [query, setQuery] = useState('');
+  const [filters, setFilters] = useState<Filters>({});
   const [result, setResult] = useState<LLMResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,7 +37,7 @@ export const useLLMPicker = () => {
       const response = await fetch('http://localhost:5000/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ task: query })
+        body: JSON.stringify({ task: query, filters })
       });
 
       const data = await response.json();
@@ -50,6 +58,8 @@ export const useLLMPicker = () => {
   return {
     query,
     setQuery,
+    filters,
+    setFilters,
     result,
     isLoading,
     findBestLLM

@@ -1,4 +1,6 @@
 import React from 'react';
+import FilterPanel from './components/FilterPanel';
+
 
 interface QueryInputProps {
   value: string;
