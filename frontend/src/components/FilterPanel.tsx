@@ -21,7 +21,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters }) => {
           onChange={(e) => setFilters((prev: any) => ({ ...prev, weight_type: e.target.value }))}
         >
           <option value="">Any</option>
-          <option value="Open">Open</option>
+          <option value="Original">Original</option>
           <option value="Restricted">Restricted</option>
           <option value="Proprietary">Proprietary</option>
         </select>
@@ -35,9 +35,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters }) => {
           onChange={(e) => setFilters((prev: any) => ({ ...prev, license: e.target.value }))}
         >
           <option value="">Any</option>
-          <option value="Apache 2.0">Apache 2.0</option>
-          <option value="MIT">MIT</option>
-          <option value="OpenRAIL">OpenRAIL</option>
+          <option value="apache-2.0">Apache 2.0</option>
+          <option value="mit">MIT</option>
+          <option value="llama3.2">LLaMA 3.2</option>
+
         </select>
       </div>
 

@@ -5,7 +5,7 @@ import QueryInput from './components/QueryInput';
 import ActionButton from './components/ActionButton';
 import ResultArea from './components/ResultArea';
 import Footer from './components/Footer';
-import FilterPanel from './components/FilterPanel'; // ✅ import this
+import FilterPanel from './components/FilterPanel';
 import { useLLMPicker } from './hooks/useLLMPicker';
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
     result, 
     isLoading, 
     findBestLLM 
-  } = useLLMPicker(); // ✅ include filters and setFilters
+  } = useLLMPicker(); 
 
   return (
     <PopupContainer>
@@ -31,7 +31,7 @@ function App() {
         Find Best LLM
       </ActionButton>
 
-      <ResultArea result={result} />
+      <ResultArea result={result}/>
       <Footer />
     </PopupContainer>
   );

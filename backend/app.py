@@ -52,12 +52,15 @@ Just respond with the one word category (like "code").
 def extract_score(row, benchmark_key):
     return row.get(benchmark_key, 0)
 
+#####################################################################################
 
 # 🧠 Recommendation endpoint
 @app.route("/recommend", methods=["POST"])
 def recommend():
     data = request.get_json()
     user_task = data.get("task", "")
+    filters = data.get("filters", {})  # 👈 New: get filters if provided
+
     task = classify_task_with_gemini(user_task)
     benchmark = task_to_benchmark.get(task)
 
@@ -65,18 +68,38 @@ def recommend():
         return jsonify({"error": "Unsupported task"}), 400
 
     try:
+        # 🧠 Step 1: Filter the leaderboard by filter options
+        df_filtered = leaderboard_df.copy()
+
+        if "weight_type" in filters:
+            df_filtered = df_filtered[df_filtered["model_weight_type"].str.lower() == filters["weight_type"].lower()]
+
+        if "license" in filters:
+            df_filtered = df_filtered[df_filtered["metadata_hub_license"].str.lower() == filters["license"].lower()]
+
+        if "architecture" in filters:
+            df_filtered = df_filtered[df_filtered["model_architecture"].str.lower() == filters["architecture"].lower()]
+
+        if "params_max" in filters:
+            df_filtered = df_filtered[df_filtered["metadata_params_billions"] <= float(filters["params_max"])]
+
+        if df_filtered.empty:
+            return jsonify({"error": "No models match the provided filters"}), 404
+
+        # 🧠 Step 2: Score remaining models
         scored_models = []
-        for _, row in leaderboard_df.iterrows():
+        for _, row in df_filtered.iterrows():
             model_name = row.get("model_name", "Unknown")
             score = extract_score(row, benchmark)
-            if pd.notna(score):  # only keep models with valid score
+            if pd.notna(score):
                 scored_models.append((model_name, score))
 
         if not scored_models:
             return jsonify({"error": "No models found with this benchmark"}), 404
 
+        # 🧠 Step 3: Return the best model among filtered
         top_model = max(scored_models, key=lambda x: x[1])
-        top_row = leaderboard_df[leaderboard_df["model_name"] == top_model[0]].iloc[0]
+        top_row = df_filtered[df_filtered["model_name"] == top_model[0]].iloc[0]
 
         return jsonify({
             "model_name": top_model[0],
@@ -94,10 +117,10 @@ def recommend():
             }
         })
 
-
     except Exception as e:
         print("Error during recommendation:", str(e))
         return jsonify({"error": "Server error"}), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
