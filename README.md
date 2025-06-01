@@ -47,7 +47,7 @@ Llm-Picker-Extension/
 ### 1. Clone the project
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/llm-picker-pro.git
+git clone https://github.com/Joseph-elias/Llm-Picker-Extension.git
 cd llm-picker-pro
 ```
 
